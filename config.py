@@ -647,7 +647,8 @@ TRANSLATION_ENGINE = "google"
 LOG_LEVEL = "INFO"
 
 # 时间窗
-TIME_WINDOW_MODE = "yesterday_only"
+# TIME_WINDOW_MODE = "yesterday_only" #设置为仅抓取昨天的新闻（默认模式）
+TIME_WINDOW_MODE = "up_to_now" #设置为抓取最新的
 
 # ============================================================
 # Google RSS 消歧配置 (v2.5 新增)
