@@ -388,7 +388,7 @@ class NewsAggregatorGUI:
                 orig_file = write_markdown_file(orig_md, bd, output_dir=OUTPUT_DIR, output_file=_fn(ds, False), prepend=True)
                 self._log(f"原文: {orig_file}")
                 if self.var_html.get():
-                    orig_html = write_html_file(orig_md, bd, output_dir=OUTPUT_DIR, output_file=_fn(ds, False))
+                    orig_html = write_html_file(orig_md, bd, output_dir=OUTPUT_DIR, output_file=_fn(ds, False), data=data)
                 if not self._running: return
 
                 if self.var_trans.get():
@@ -400,13 +400,13 @@ class NewsAggregatorGUI:
                         trans_file = write_markdown_file(trans_md, bd, output_dir=OUTPUT_DIR, output_file=_fn(ds, True), prepend=True)
                         self._log(f"翻译: {trans_file}")
                         if self.var_html.get():
-                            trans_html = write_html_file(trans_md, bd, output_dir=OUTPUT_DIR, output_file=_fn(ds, True))
+                            trans_html = write_html_file(trans_md, bd, output_dir=OUTPUT_DIR, output_file=_fn(ds, True), data=data_t)
                         if self.var_bilingual.get():
                             bi_md = generate_markdown_bilingual(data_t, generation_time=datetime.now(), window_mode=mode, stats=stats, has_content=self.var_content.get())
                             bi_file = write_markdown_file(bi_md, bd, output_dir=OUTPUT_DIR, output_file=O_BI.replace("{date}", ds), prepend=True)
                             self._log(f"对照: {bi_file}")
                             if self.var_html.get():
-                                bi_html = write_html_file(bi_md, bd, output_dir=OUTPUT_DIR, output_file=O_BI.replace("{date}", ds))
+                                bi_html = write_html_file(bi_md, bd, output_dir=OUTPUT_DIR, output_file=O_BI.replace("{date}", ds), data=data_t)
                     else: self._log("Google翻译不可用（需VPN）")
                 else: self._log("跳过翻译")
 

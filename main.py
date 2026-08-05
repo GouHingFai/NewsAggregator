@@ -52,7 +52,7 @@ def run(no_translate=False, no_content=False, no_html=False):
                                 window_mode=mode, stats=stats, has_content=not no_content)
     orig_file = write_markdown_file(orig_md, _APP_DIR, output_dir=OUTPUT_DIR, output_file=_fn(ds, False), prepend=True)
     logger.info("原文: %s", orig_file)
-    if not no_html: write_html_file(orig_md, _APP_DIR, output_dir=OUTPUT_DIR, output_file=_fn(ds, False))
+    if not no_html: write_html_file(orig_md, _APP_DIR, output_dir=OUTPUT_DIR, output_file=_fn(ds, False), data=data)
 
     trans_file = None
     if not no_translate:
@@ -64,11 +64,11 @@ def run(no_translate=False, no_content=False, no_html=False):
                                          window_mode=mode, stats=stats, has_content=not no_content)
             trans_file = write_markdown_file(trans_md, _APP_DIR, output_dir=OUTPUT_DIR, output_file=_fn(ds, True), prepend=True)
             logger.info("翻译: %s", trans_file)
-            if not no_html: write_html_file(trans_md, _APP_DIR, output_dir=OUTPUT_DIR, output_file=_fn(ds, True))
+            if not no_html: write_html_file(trans_md, _APP_DIR, output_dir=OUTPUT_DIR, output_file=_fn(ds, True), data=data_t)
             bi_md = generate_markdown_bilingual(data_t, generation_time=now_beijing(),
                                                 window_mode=mode, stats=stats, has_content=not no_content)
             write_markdown_file(bi_md, _APP_DIR, output_dir=OUTPUT_DIR, output_file=O_BI.replace("{date}", ds), prepend=True)
-            if not no_html: write_html_file(bi_md, _APP_DIR, output_dir=OUTPUT_DIR, output_file=O_BI.replace("{date}", ds))
+            if not no_html: write_html_file(bi_md, _APP_DIR, output_dir=OUTPUT_DIR, output_file=O_BI.replace("{date}", ds), data=data_t)
         else: logger.warning("Google 翻译不可用")
     logger.info("全部完成！")
     return {"orig": orig_file, "trans": trans_file, "stats": stats}

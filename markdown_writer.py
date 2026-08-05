@@ -217,24 +217,65 @@ hr{border:none;border-top:1px solid #d4e6f1;margin:20px 0}
 strong{color:#1a5276}
 blockquote{border-left:3px solid #aed6f1;margin:10px 0;padding:5px 15px;color:#555;background:#f7fafc}
 .footer{color:#999;font-size:.85em;margin-top:40px;border-top:1px solid #eee;padding-top:15px}
+.nav{position:fixed;top:0;left:0;right:0;background:#1a5276;padding:8px 20px;z-index:999;display:flex;flex-wrap:wrap;gap:4px;max-height:40vh;overflow-y:auto}
+.nav a{color:#fff;text-decoration:none;font-size:12px;padding:3px 8px;border-radius:3px;white-space:nowrap}
+.nav a:hover,.nav a:focus{background:#2980b9}
+.nav-toggle{display:none;position:fixed;top:5px;right:10px;z-index:1000;background:#1a5276;color:#fff;border:none;padding:6px 12px;border-radius:4px;font-size:14px;cursor:pointer}
+@media(max-width:600px){.nav{display:none}.nav.open{display:flex}.nav-toggle{display:block}}
+body{padding-top:50px}
 </style>"""
 
 
-def generate_html(md_content):
+def _generate_nav(data):
+    """生成导航栏HTML"""
+    links = ['<div class="nav" id="topNav"><a href="#top">📊 概览</a>']
+    for cn in data:
+        anchor = cn.replace(" ", "-").replace("⚔️", "war")
+        parts = cn.split(" ", 1)
+        flag = parts[0] if len(parts) > 1 and any(c in parts[0] for c in "⚔️🇸🇦🇦🇪") else ""
+        name = cn
+        links.append(f'<a href="#{anchor}">{cn}</a>')
+    links.append('</div><button class="nav-toggle" onclick="document.getElementById(\'topNav\').classList.toggle(\'open\')">☰ 导航</button>')
+    return "".join(links)
+
+
+def _inject_nav(html_body, data):
+    """在 HTML body 中注入导航栏和锚点"""
+    # 先给每个 h2 加 id
+    for cn in data:
+        anchor = cn.replace(" ", "-").replace("⚔️", "war")
+        html_body = html_body.replace(
+            f'<h2>{cn}',
+            f'<h2 id="{anchor}">{cn}'
+        )
+    # 在 body 内插入导航
+    nav = _generate_nav(data)
+    html_body = html_body.replace('<body>', f'<body>{nav}')
+    # 给概览的 h2 加锚点
+    html_body = html_body.replace(
+        '<h2>新闻概览',
+        '<h2 id="top">新闻概览'
+    )
+    return html_body
+
+
+def generate_html(md_content, data=None):
     try:
         import markdown as _md
         html_body = _md.markdown(md_content, extensions=['extra'])
     except ImportError:
         html_body = md_content.replace('\n', '<br>\n')
-    return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">{_HTML_CSS}</head>
+    if data:
+        html_body = _inject_nav(html_body, data)
+    return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">{_HTML_CSS}</head>
 <body>{html_body}<div class="footer">本报告由自动新闻聚合系统生成</div></body></html>"""
 
 
-def write_html_file(md_content, base_dir, output_dir=OUTPUT_DIR, output_file="news.html"):
+def write_html_file(md_content, base_dir, output_dir=OUTPUT_DIR, output_file="news.html", data=None):
     full_dir = os.path.join(base_dir, output_dir)
     os.makedirs(full_dir, exist_ok=True)
     if output_file.endswith('.md'): output_file = output_file[:-3] + '.html'
     file_path = os.path.join(full_dir, output_file)
-    with open(file_path, "w", encoding="utf-8") as f: f.write(generate_html(md_content))
+    with open(file_path, "w", encoding="utf-8") as f: f.write(generate_html(md_content, data=data))
     logger.info(f"HTML: {file_path}")
     return file_path
