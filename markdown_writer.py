@@ -231,9 +231,6 @@ def _generate_nav(data):
     links = ['<div class="nav" id="topNav"><a href="#top">📊 概览</a>']
     for cn in data:
         anchor = cn.replace(" ", "-").replace("⚔️", "war")
-        parts = cn.split(" ", 1)
-        flag = parts[0] if len(parts) > 1 and any(c in parts[0] for c in "⚔️🇸🇦🇦🇪") else ""
-        name = cn
         links.append(f'<a href="#{anchor}">{cn}</a>')
     links.append('</div><button class="nav-toggle" onclick="document.getElementById(\'topNav\').classList.toggle(\'open\')">☰ 导航</button>')
     return "".join(links)
@@ -244,23 +241,19 @@ def _inject_nav(html_body, data):
     # 先给每个 h2 加 id（h2 格式: <h2>🇸🇦 沙特阿拉伯 (Saudi Arabia)</h2>）
     for cn in data:
         anchor = cn.replace(" ", "-").replace("⚔️", "war")
-        # 尝试匹配带国旗的 h2
-        import re
-        pattern = re.compile(r'<h2>[^\n]*' + re.escape(cn) + r'[^\n]*</h2>')
+        import re as _re2
+        pattern = _re2.compile(r'<h2>[^\n]*' + _re2.escape(cn) + r'[^\n]*</h2>')
         m = pattern.search(html_body)
         if m:
             old_h2 = m.group(0)
             new_h2 = old_h2.replace('<h2>', f'<h2 id="{anchor}">')
             html_body = html_body.replace(old_h2, new_h2)
-    # 在 body 内插入导航
+    # html_body 是 markdown 渲染后的纯内容（无 <body> 标签），直接在前面拼接导航
     nav = _generate_nav(data)
-    html_body = html_body.replace('<body>', f'<body>{nav}')
-    # 给概览的 h2 加锚点
-    html_body = html_body.replace(
-        '<h2>新闻概览',
-        '<h2 id="top">新闻概览'
-    )
-    return html_body
+    # 给概览的 h2 加锚点（标题格式: "2026年08月05日 新闻概览"）
+    import re as _re
+    html_body = _re.sub(r'<h2>([^<]*)新闻概览</h2>', r'<h2 id="top">\1新闻概览</h2>', html_body)
+    return nav + html_body
 
 
 def generate_html(md_content, data=None):
@@ -280,6 +273,7 @@ def write_html_file(md_content, base_dir, output_dir=OUTPUT_DIR, output_file="ne
     os.makedirs(full_dir, exist_ok=True)
     if output_file.endswith('.md'): output_file = output_file[:-3] + '.html'
     file_path = os.path.join(full_dir, output_file)
-    with open(file_path, "w", encoding="utf-8") as f: f.write(generate_html(md_content, data=data))
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(generate_html(md_content, data=data))
     logger.info(f"HTML: {file_path}")
     return file_path
