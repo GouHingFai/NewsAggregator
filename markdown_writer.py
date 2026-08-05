@@ -241,13 +241,17 @@ def _generate_nav(data):
 
 def _inject_nav(html_body, data):
     """在 HTML body 中注入导航栏和锚点"""
-    # 先给每个 h2 加 id
+    # 先给每个 h2 加 id（h2 格式: <h2>🇸🇦 沙特阿拉伯 (Saudi Arabia)</h2>）
     for cn in data:
         anchor = cn.replace(" ", "-").replace("⚔️", "war")
-        html_body = html_body.replace(
-            f'<h2>{cn}',
-            f'<h2 id="{anchor}">{cn}'
-        )
+        # 尝试匹配带国旗的 h2
+        import re
+        pattern = re.compile(r'<h2>[^\n]*' + re.escape(cn) + r'[^\n]*</h2>')
+        m = pattern.search(html_body)
+        if m:
+            old_h2 = m.group(0)
+            new_h2 = old_h2.replace('<h2>', f'<h2 id="{anchor}">')
+            html_body = html_body.replace(old_h2, new_h2)
     # 在 body 内插入导航
     nav = _generate_nav(data)
     html_body = html_body.replace('<body>', f'<body>{nav}')

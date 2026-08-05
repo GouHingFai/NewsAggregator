@@ -11,6 +11,7 @@ from datetime import datetime
 
 import markdown as md_lib
 from config import EMAIL_CONFIG
+from markdown_writer import generate_html
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +55,7 @@ def send_email(md_content, subject=None, to_email=None, to_email2=None,
     else:
         msg.attach(MIMEText(md_content, "plain", "utf-8"))
         try:
-            msg.attach(MIMEText(markdown_to_html(md_content), "html", "utf-8"))
+            msg.attach(MIMEText(generate_html(md_content), "html", "utf-8"))
         except Exception:
             pass
 
