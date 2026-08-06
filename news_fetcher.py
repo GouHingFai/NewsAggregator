@@ -453,7 +453,7 @@ class NewsAggregator:
         return results
 
     def _fetch_war_topic(self, results):
-        logger.info("以色列-伊朗战争专题 (Google RSS)...")
+        logger.info("以伊专题 (Google RSS)...")
         war_raw = []; seen_war = set()
         ws = get_time_window_start(); we = get_time_window_end()
         batch_size = 5
@@ -467,13 +467,13 @@ class NewsAggregator:
             for item in items:
                 if item.aid in seen_war: continue
                 seen_war.add(item.aid)
-                item.country = "⚔️ 以色列-伊朗战争"; item.domain = "综合/其它"; item.tags = "战争专题"
+                item.country = "⚔️ 以伊专题"; item.domain = "综合/其它"; item.tags = "战争专题"
                 war_raw.append(item)
             if self._check_stop(): break
             time.sleep(0.8)
         war_raw = war_raw[:WAR_TOPIC_ARTICLES]
         if war_raw:
-            cn = "⚔️ 以色列-伊朗战争"
+            cn = "⚔️ 以伊专题"
             if cn not in results: results[cn] = {d["name_zh"]: [] for d in DOMAINS}
             results[cn]["综合/其它"] = war_raw
         logger.info("战争专题: %d 条", len(war_raw))

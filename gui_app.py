@@ -119,7 +119,7 @@ class NewsAggregatorGUI:
         self.var_html = tk.BooleanVar(value=True)
         ttk.Checkbutton(p, text="生成HTML版", variable=self.var_html).pack(anchor=tk.W, pady=(2, 0))
         self.var_war_topic = tk.BooleanVar(value=WAR_TOPIC_ENABLED)
-        ttk.Checkbutton(p, text="以色列-伊朗战争专题", variable=self.var_war_topic).pack(anchor=tk.W, pady=(2, 0))
+        ttk.Checkbutton(p, text="以伊专题", variable=self.var_war_topic).pack(anchor=tk.W, pady=(2, 0))
 
         tf3 = ttk.LabelFrame(p, text="时间窗口", padding=10)
         tf3.pack(fill=tk.X, pady=(0, 8))
